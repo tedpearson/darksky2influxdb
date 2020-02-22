@@ -146,6 +146,8 @@ var getForecast = function (latitude, longitude, locationName) {
                         point.measurement = 'forecast_history'
                         point.tags.forecast_time_tag = fc.time
                         point.fields.forecast_time_field = fc.time
+                        // not writing daytime due to preexising schema and not caring about this field
+                        point.fields.delete('daytime')
                     }
                     influx.writePoints(points).catch(err => {
                         console.error('Error writing history to InfluxDB', err)
