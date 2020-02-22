@@ -1,14 +1,17 @@
 general:
   debug: true
+  write_history: false
   cron: '*/15 * * * *'
 darksky:
   key: DARKSKY_KEY
   units: auto
   language: en
-  longitude: DARKSKY_LONGITUDE
-  latitude: DARKSKY_LATITUDE
+  locations:
+    - longitude: DARKSKY_LONGITUDE
+      latitude: DARKSKY_LATITUDE
+      name: FRIENDLY_LOCATION_NAME
 influxdb:
   host: INFLUXDB_HOST
   database: INFLUXDB_DATABASE
   username: INFLUXDB_USERNAME
-password: INFLUXDB_PASSWORD
+  password: INFLUXDB_PASSWORD

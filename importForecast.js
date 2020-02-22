@@ -28,7 +28,7 @@ const influx = new Influx.InfluxDB({
     schema: [
         {
             measurement: 'forecast',
-            tags: ['source'],
+            tags: ['source', 'location'],
             fields: {
                 precipIntensity: Influx.FieldType.FLOAT,
                 precipProbability: Influx.FieldType.FLOAT,
@@ -53,8 +53,14 @@ const influx = new Influx.InfluxDB({
 
 const darksky = new DarkSky(darkskyConfig.key);
 
-var getForecast = function () {
-    darksky.forecast(darkskyConfig.latitude, darkskyConfig.longitude, {
+var getForecasts = function() {
+    for (const location of darkskyConfig.locations) {
+        getForecast(location.latitude, location.longitude, location.name)
+    }
+}
+
+var getForecast = function (latitude, longitude, locationName) {
+    darksky.forecast(latitude, longitude, {
         exclude: ['minutely', 'currently', 'alerts', 'flags'],
         units: darkskyConfig.units,
         lang: darkskyConfig.language,
@@ -118,7 +124,8 @@ var getForecast = function () {
                             nightime_show: nightime_show
                         },
                         tags: {
-                            source: 'darksky'
+                            source: 'darksky',
+                            location: locationName
                         },
                         timestamp:fc.time + '000000000'
                     }
@@ -134,6 +141,17 @@ var getForecast = function () {
                     console.error('Error writing to InfluxDB', err)
                 })
 
+                if (generalConfig.get("write_history")) {
+                    for (point of points) {
+                        point.measurement = 'forecast_history'
+                        point.tags.forecast_time_tag = fc.time
+                        point.fields.forecast_time_field = fc.time
+                    }
+                    influx.writePoints(points).catch(err => {
+                        console.error('Error writing history to InfluxDB', err)
+                    })
+                }
+
             }
         }
     })
@@ -141,12 +159,12 @@ var getForecast = function () {
 
 if (generalConfig.cron) {
     cron.schedule(generalConfig.cron, function(){
-        getForecast();
+        getForecasts();
     });
 
     console.log(`DarkSky data will be written to InfluxDB on cron interval '${generalConfig.cron}'`);
 } else {
-    getForecast();
+    getForecasts();
 
     console.log('DarkSky data is written to InfluxDB');
 }
