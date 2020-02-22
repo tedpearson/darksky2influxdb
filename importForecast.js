@@ -47,6 +47,28 @@ const influx = new Influx.InfluxDB({
                 nightime_show: Influx.FieldType.FLOAT
 
             }
+        },
+        {
+            measurement: 'forecast_history',
+            tags: ['source', 'location', 'forecast_time_tag'],
+            fields: {
+                precipIntensity: Influx.FieldType.FLOAT,
+                precipProbability: Influx.FieldType.FLOAT,
+                temperature: Influx.FieldType.FLOAT,
+                apparent_temperature: Influx.FieldType.FLOAT,
+                dew_point: Influx.FieldType.FLOAT,
+                humidity: Influx.FieldType.FLOAT,
+                wind_speed: Influx.FieldType.FLOAT,
+                wind_bearing: Influx.FieldType.FLOAT,
+                cloud_cover: Influx.FieldType.FLOAT,
+                sun_cover: Influx.FieldType.FLOAT,
+                pressure: Influx.FieldType.FLOAT,
+                ozone: Influx.FieldType.FLOAT,
+                daytime: Influx.FieldType.BOOLEAN,
+                daytime_show: Influx.FieldType.FLOAT,
+                nightime_show: Influx.FieldType.FLOAT,
+                forecast_time_field: Influx.FieldType.INTEGER
+            }
         }
     ]
 })
