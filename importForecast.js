@@ -82,6 +82,10 @@ var getForecasts = function() {
 }
 
 var getForecast = function (latitude, longitude, locationName) {
+    let currentTime = new Date();
+    currentTime.setSeconds(0);
+    currentTime.setMilliseconds(0);
+    let forecastTimestamp = currentTime.getTime() / 1000
     darksky.forecast(latitude, longitude, {
         exclude: ['minutely', 'currently', 'alerts', 'flags'],
         units: darkskyConfig.units,
@@ -102,6 +106,7 @@ var getForecast = function (latitude, longitude, locationName) {
             if (generalConfig.debug) {
                 console.dir(hourly)
             }
+            let firstTime = 0;
 
             console.log('Writing '+ hourly.data.length +' Datapoints to InfluxDB in Database "' + influxConfig.database + '" with measurement "forecast" on ' + influxConfig.host);
              for (var i = 0, len = hourly.data.length; i < len; ++i) {
@@ -166,8 +171,8 @@ var getForecast = function (latitude, longitude, locationName) {
                 if (generalConfig.get("write_history")) {
                     for (point of points) {
                         point.measurement = 'forecast_history'
-                        point.tags.forecast_time_tag = fc.time
-                        point.fields.forecast_time_field = fc.time
+                        point.tags.forecast_time_tag = forecastTimestamp
+                        point.fields.forecast_time_field = forecastTimestamp
                         // not writing daytime due to preexising schema and not caring about this field
                         delete point.fields.daytime
                     }
