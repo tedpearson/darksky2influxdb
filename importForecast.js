@@ -20,6 +20,11 @@ if (!darkskyConfig.key) {
     throw new Error('DarkSky key should be provided')
 }
 
+const historyWriteOptions = {}
+if ('history_retention_policy' in generalConfig) {
+    historyWriteOptions.retentionPolicy = generalConfig.history_retention_policy
+}
+
 const influx = new Influx.InfluxDB({
     host: influxConfig.host,
     database: influxConfig.database,
@@ -176,7 +181,7 @@ var getForecast = function (latitude, longitude, locationName) {
                         // not writing daytime due to preexising schema and not caring about this field
                         delete point.fields.daytime
                     }
-                    influx.writePoints(points).catch(err => {
+                    influx.writePoints(points, historyWriteOptions).catch(err => {
                         console.error('Error writing history to InfluxDB', err)
                     })
                 }

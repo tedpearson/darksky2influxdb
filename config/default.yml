@@ -1,6 +1,8 @@
 general:
   debug: true
   write_history: false
+  # optional:
+  # history_retention_policy: RETENTION_POLICY_NAME
   cron: '*/15 * * * *'
 darksky:
   key: DARKSKY_KEY
